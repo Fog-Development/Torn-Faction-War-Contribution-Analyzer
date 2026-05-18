@@ -1,0 +1,18 @@
+# Rust build artifacts
+/target/
+
+# Generated reports (produced by the tool at runtime)
+/reports/
+
+# Config overrides (user-local, not part of the project)
+torn-war-report.toml
+
+# Editor and IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
