@@ -1,0 +1,9 @@
+[analysis]
+low_percentile = 0.20
+min_days_for_activity = 7
+activity_threshold = 750.0
+zero_war_kick_threshold = 2
+poor_war_threshold = 2
+
+[output]
+formats = ["xlsx", "csv", "markdown"]

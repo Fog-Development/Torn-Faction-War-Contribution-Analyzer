@@ -1,0 +1,15 @@
+[package]
+name = "twr-report"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Report generation (XLSX, CSV, Markdown) for Torn war analysis"
+
+[dependencies]
+twr-core = { workspace = true }
+serde = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+rust_xlsxwriter = { workspace = true }
+tracing = { workspace = true }

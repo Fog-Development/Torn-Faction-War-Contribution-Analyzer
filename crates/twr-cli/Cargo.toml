@@ -1,0 +1,30 @@
+[package]
+name = "twr-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "CLI for Torn faction war contribution analysis"
+
+[[bin]]
+name = "torn-war-report"
+path = "src/main.rs"
+
+[dependencies]
+twr-core = { workspace = true }
+twr-report = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+globset = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+toml = { workspace = true }
+
+[dev-dependencies]
+assert_cmd = { workspace = true }
+predicates = { workspace = true }
+insta = { workspace = true }
+tempfile = { workspace = true }
+regex = { workspace = true }
