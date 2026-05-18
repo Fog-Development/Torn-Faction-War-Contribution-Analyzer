@@ -59,8 +59,10 @@ fn full_pipeline_against_fixtures() {
     assert!(warn_text.contains("Trent"));
     assert!(warn_text.contains("Uma"));
 
-    // Ghost1 appears in Delta but not in activity CSV → MissingActivityRecord warning.
+    // Ghost1 appears in Delta but not in activity CSV → MissingActivityRecord warning,
+    // and excluded from members entirely (treated as an ex-member).
     assert!(warn_text.contains("Ghost1"));
+    assert!(!report.members.iter().any(|m| m.name == "Ghost1"));
 
     // BadRow had malformed Points → MalformedRow warning emitted, member not in summary.
     assert!(warn_text.contains("BadRow"));

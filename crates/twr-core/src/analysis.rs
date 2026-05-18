@@ -140,38 +140,11 @@ pub fn analyze_with_collector(
         .map(|w| (reference_time - w.start_utc).num_days())
         .collect();
 
-    // Gather the universe of member names: every name in activity ∪ every name in a war.
-    let mut universe: BTreeMap<String, ()> = BTreeMap::new();
-    for a in &activity {
-        universe.insert(a.name.clone(), ());
-    }
-    for war in &wars {
-        for p in &war.participants {
-            universe.insert(p.name.clone(), ());
-        }
-    }
-    let member_names: Vec<String> = universe.into_keys().collect();
-
-    // Compute per-war low thresholds. "present_points" = points from members marked present.
-    let mut war_thresholds: Vec<f64> = Vec::with_capacity(wars.len());
-    for (wi, war) in wars.iter().enumerate() {
-        let mut present_points: Vec<u32> = Vec::new();
-        for p in &war.participants {
-            let act_days = activity_by_name.get(&p.name).and_then(|a| a.days);
-            if is_present(act_days, days_ago[wi], true) {
-                present_points.push(p.points);
-            }
-        }
-        war_thresholds.push(compute_threshold(
-            &present_points,
-            config.analysis.low_percentile,
-        ));
-    }
-
-    // Warn for members listed in wars but missing from activity.
+    // Identify war-CSV names that have no activity record — these are members who have
+    // since left or been kicked. Warn once per name and exclude them from all analysis.
+    let act_names: std::collections::HashSet<&str> =
+        activity.iter().map(|a| a.name.as_str()).collect();
     {
-        let act_names: std::collections::HashSet<&str> =
-            activity.iter().map(|a| a.name.as_str()).collect();
         let mut warned: std::collections::HashSet<String> = std::collections::HashSet::new();
         for war in &wars {
             for p in &war.participants {
@@ -181,7 +154,9 @@ pub fn analyze_with_collector(
                             WarningKind::MissingActivityRecord,
                             "analysis",
                             format!(
-                                "member `{}` appears in war `{}` but has no activity record",
+                                "member `{}` appears in war `{}` but has no activity record; \
+                                 they have likely left or been kicked since that war and will \
+                                 be excluded from all reports",
                                 p.name, war.display_name
                             ),
                         )
@@ -190,6 +165,31 @@ pub fn analyze_with_collector(
                 }
             }
         }
+    }
+
+    // Member universe = activity list only. War-CSV-only names (no activity record) are
+    // treated as ex-members and excluded from all output lists.
+    let member_names: Vec<String> = activity.iter().map(|a| a.name.clone()).collect();
+
+    // Compute per-war low thresholds. Only count members who have an activity record
+    // and are considered present — ex-members are excluded from the threshold too.
+    let mut war_thresholds: Vec<f64> = Vec::with_capacity(wars.len());
+    for (wi, war) in wars.iter().enumerate() {
+        let mut present_points: Vec<u32> = Vec::new();
+        for p in &war.participants {
+            // Skip ex-members (no activity record) entirely.
+            if !act_names.contains(p.name.as_str()) {
+                continue;
+            }
+            let act_days = activity_by_name.get(&p.name).and_then(|a| a.days);
+            if is_present(act_days, days_ago[wi], true) {
+                present_points.push(p.points);
+            }
+        }
+        war_thresholds.push(compute_threshold(
+            &present_points,
+            config.analysis.low_percentile,
+        ));
     }
 
     // Build per-member summaries.
