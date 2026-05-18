@@ -17,3 +17,7 @@ torn-war-report.toml
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+
+# RW Data
+member-activity/
+ranked-war-data/
