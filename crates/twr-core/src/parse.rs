@@ -145,15 +145,14 @@ pub fn parse_war_csv(path: &Path, warnings: &WarningCollector) -> Result<War, Pa
         .map(|s| s.to_string_lossy().to_string())
         .unwrap_or_else(|| path_str.clone());
 
-    let (display_name, start_utc) = extract_war_datetime(&filename).map_err(|e| {
-        if let ParseError::FilenameDateMissing { .. } = &e {
+    let (display_name, start_utc) = extract_war_datetime(&filename).inspect_err(|e| {
+        if let ParseError::FilenameDateMissing { .. } = e {
             warnings.push(Warning::new(
                 WarningKind::FilenameDateMissing,
                 path_str.clone(),
                 format!("filename `{}` lacks ISO-8601 datetime stamp", filename),
             ));
         }
-        e
     })?;
 
     let file = File::open(path).map_err(|e| ParseError::Io {
