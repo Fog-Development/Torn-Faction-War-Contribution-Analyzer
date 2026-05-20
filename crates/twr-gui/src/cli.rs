@@ -9,10 +9,10 @@ use tauri::{AppHandle, Manager};
 pub fn sidecar_path(app: &AppHandle) -> PathBuf {
     // Tauri 2 resolves sidecar resources via `path().resolve`.
     // The binary name must match the key in tauri.conf.json `bundle.externalBin`.
-    if let Ok(p) = app
-        .path()
-        .resolve("binaries/torn-war-report", tauri::path::BaseDirectory::Resource)
-    {
+    if let Ok(p) = app.path().resolve(
+        "binaries/torn-war-report",
+        tauri::path::BaseDirectory::Resource,
+    ) {
         if p.exists() {
             return p;
         }

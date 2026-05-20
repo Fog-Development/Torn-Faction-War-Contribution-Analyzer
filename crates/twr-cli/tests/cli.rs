@@ -229,7 +229,11 @@ fn schema_emit_json_shape() {
 
     let text = String::from_utf8(raw).unwrap();
     let lines: Vec<&str> = text.lines().filter(|l| !l.is_empty()).collect();
-    assert_eq!(lines.len(), 1, "schema --emit=json should emit exactly one line");
+    assert_eq!(
+        lines.len(),
+        1,
+        "schema --emit=json should emit exactly one line"
+    );
 
     let obj: serde_json::Value = serde_json::from_str(lines[0]).expect("output is JSON");
     assert_eq!(obj["type"], "schema");

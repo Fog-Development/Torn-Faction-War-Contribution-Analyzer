@@ -59,11 +59,7 @@ pub fn is_present(days: Option<u32>, days_ago: i64, listed_in_csv: bool) -> bool
 }
 
 /// Classify a single war-participation observation.
-pub fn classify_member(
-    points: u32,
-    present: bool,
-    low_threshold: f64,
-) -> WarCategory {
+pub fn classify_member(points: u32, present: bool, low_threshold: f64) -> WarCategory {
     if !present {
         return WarCategory::Excluded;
     }
@@ -131,8 +127,11 @@ pub fn analyze_with_collector(
     }
 
     // Build name -> activity lookup. Names are case-sensitive per spec.
-    let activity_by_name: BTreeMap<String, MemberActivity> =
-        activity.iter().cloned().map(|a| (a.name.clone(), a)).collect();
+    let activity_by_name: BTreeMap<String, MemberActivity> = activity
+        .iter()
+        .cloned()
+        .map(|a| (a.name.clone(), a))
+        .collect();
 
     // Compute days_ago for each war.
     let days_ago: Vec<i64> = wars
@@ -430,11 +429,7 @@ mod tests {
         let war_b = make_war(
             "Beta",
             Utc.with_ymd_and_hms(2026, 2, 1, 0, 0, 0).unwrap(),
-            vec![
-                ("Alice", 1, 1100, 11),
-                ("Bob", 2, 0, 0),
-                ("Carol", 3, 0, 0),
-            ],
+            vec![("Alice", 1, 1100, 11), ("Bob", 2, 0, 0), ("Carol", 3, 0, 0)],
         );
         let activity = vec![
             MemberActivity {
@@ -459,14 +454,9 @@ mod tests {
         let cfg = Config::default();
         let warnings = WarningCollector::new();
         let ref_time = Utc.with_ymd_and_hms(2026, 5, 1, 0, 0, 0).unwrap();
-        let report = analyze_with_collector(
-            vec![war_a, war_b],
-            activity,
-            &cfg,
-            &warnings,
-            ref_time,
-        )
-        .unwrap();
+        let report =
+            analyze_with_collector(vec![war_a, war_b], activity, &cfg, &warnings, ref_time)
+                .unwrap();
 
         // Carol has 2 zeros → auto-kick
         assert!(report.auto_kick.contains(&"Carol".to_string()));

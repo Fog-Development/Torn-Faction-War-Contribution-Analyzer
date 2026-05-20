@@ -75,9 +75,7 @@ fn main() -> ExitCode {
 
 fn dispatch(cli: Cli) -> anyhow::Result<i32> {
     match cli.command {
-        Command::Analyze(args) => {
-            commands::analyze::run(args, cli.config.as_deref(), cli.emit)
-        }
+        Command::Analyze(args) => commands::analyze::run(args, cli.config.as_deref(), cli.emit),
         Command::Validate(args) => commands::validate::run(args, cli.emit),
         Command::Schema => commands::schema::run(cli.emit).map(|_| 0),
     }
@@ -93,8 +91,11 @@ fn init_logging(verbose: u8, quiet: bool) {
             _ => "trace",
         }
     };
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(format!("twr_cli={level},twr_core={level},twr_report={level}")));
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+        EnvFilter::new(format!(
+            "twr_cli={level},twr_core={level},twr_report={level}"
+        ))
+    });
     let _ = tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_target(false)

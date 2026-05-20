@@ -53,14 +53,19 @@ pub fn render(report: &AnalysisReport) -> String {
     let _ = writeln!(
         s,
         "Reference time: {}",
-        report.reference_time.to_rfc3339_opts(SecondsFormat::Secs, true)
+        report
+            .reference_time
+            .to_rfc3339_opts(SecondsFormat::Secs, true)
     );
     let _ = writeln!(s);
 
     // --- Wars analysed ---
     let _ = writeln!(s, "## Wars analyzed");
     let _ = writeln!(s);
-    let _ = writeln!(s, "| War | Date (UTC) | Days ago | Participants | Low threshold |");
+    let _ = writeln!(
+        s,
+        "| War | Date (UTC) | Days ago | Participants | Low threshold |"
+    );
     let _ = writeln!(s, "|---|---|---|---|---|");
     for (i, war) in report.wars.iter().enumerate() {
         let days_ago = (report.reference_time - war.start_utc).num_days();
@@ -102,7 +107,11 @@ pub fn render(report: &AnalysisReport) -> String {
     }
 
     // --- Auto-Kick ---
-    let _ = writeln!(s, "## 🚨 Auto-Kick List ({} members)", report.auto_kick.len());
+    let _ = writeln!(
+        s,
+        "## 🚨 Auto-Kick List ({} members)",
+        report.auto_kick.len()
+    );
     let _ = writeln!(s);
     render_kick_table(&mut s, report, &report.auto_kick);
     let _ = writeln!(s);
@@ -121,7 +130,8 @@ pub fn render(report: &AnalysisReport) -> String {
     let _ = writeln!(
         s,
         "## Low Activity — avgE30 < {} ({} members)",
-        report.config.analysis.activity_threshold, report.low_activity.len()
+        report.config.analysis.activity_threshold,
+        report.low_activity.len()
     );
     let _ = writeln!(s);
     render_low_activity(&mut s, report);
@@ -172,7 +182,10 @@ fn render_low_activity(s: &mut String, report: &AnalysisReport) {
         let _ = writeln!(s, "_(none)_");
         return;
     }
-    let _ = writeln!(s, "| Member | Days | avgE30 | Present | Zero | Low | Avg Pts |");
+    let _ = writeln!(
+        s,
+        "| Member | Days | avgE30 | Present | Zero | Low | Avg Pts |"
+    );
     let _ = writeln!(s, "|---|---|---|---|---|---|---|");
     for name in &report.low_activity {
         if let Some(m) = lookup(report, name) {

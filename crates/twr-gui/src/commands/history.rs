@@ -18,14 +18,11 @@ pub struct RunSummary {
 }
 
 #[tauri::command]
-pub fn list_history(
-    _app: AppHandle,
-    reports_root: PathBuf,
-) -> Result<Vec<RunSummary>, String> {
+pub fn list_history(_app: AppHandle, reports_root: PathBuf) -> Result<Vec<RunSummary>, String> {
     let mut summaries = Vec::new();
 
-    let entries = std::fs::read_dir(&reports_root)
-        .map_err(|e| format!("cannot read reports dir: {e}"))?;
+    let entries =
+        std::fs::read_dir(&reports_root).map_err(|e| format!("cannot read reports dir: {e}"))?;
 
     for entry in entries.flatten() {
         let run_json = entry.path().join("run.json");
@@ -44,10 +41,7 @@ pub fn list_history(
         let dir_name = entry.file_name().to_string_lossy().to_string();
         summaries.push(RunSummary {
             run_id: dir_name,
-            reference_time: v["reference_time"]
-                .as_str()
-                .unwrap_or("")
-                .to_string(),
+            reference_time: v["reference_time"].as_str().unwrap_or("").to_string(),
             output_dir: v["output_dir"].as_str().unwrap_or("").to_string(),
             warning_count: v["warning_count"].as_u64().unwrap_or(0) as usize,
             exit_code: v["exit_code"].as_i64().unwrap_or(0) as i32,
@@ -59,10 +53,7 @@ pub fn list_history(
                 .iter()
                 .filter_map(|x| x.as_str().map(|s| s.to_string()))
                 .collect(),
-            input_activity_file: v["input_activity_file"]
-                .as_str()
-                .unwrap_or("")
-                .to_string(),
+            input_activity_file: v["input_activity_file"].as_str().unwrap_or("").to_string(),
         });
     }
 

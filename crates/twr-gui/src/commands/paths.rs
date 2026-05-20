@@ -40,10 +40,7 @@ pub fn set_settings(app: AppHandle, settings: AppSettings) -> Result<(), String>
 
 #[tauri::command]
 pub async fn pick_directory(app: AppHandle) -> Result<Option<String>, String> {
-    let path = app
-        .dialog()
-        .file()
-        .blocking_pick_folder();
+    let path = app.dialog().file().blocking_pick_folder();
     Ok(path.map(|p| p.to_string()))
 }
 

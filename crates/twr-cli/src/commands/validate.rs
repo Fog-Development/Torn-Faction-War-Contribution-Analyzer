@@ -106,7 +106,10 @@ pub fn run(args: ValidateArgs, emit: EmitMode) -> anyhow::Result<i32> {
                 );
             }
         } else {
-            println!("validation OK — {} war file(s), 0 warnings", war_paths.len());
+            println!(
+                "validation OK — {} war file(s), 0 warnings",
+                war_paths.len()
+            );
         }
     }
 

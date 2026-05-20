@@ -179,7 +179,11 @@ pub fn run(args: AnalyzeArgs, config_path: Option<&Path>, emit: EmitMode) -> any
 
     let out_paths = OutputPaths {
         xlsx: outputs.xlsx.as_ref().map(|p| p.display().to_string()),
-        csv: outputs.csv.iter().map(|p| p.display().to_string()).collect(),
+        csv: outputs
+            .csv
+            .iter()
+            .map(|p| p.display().to_string())
+            .collect(),
         markdown: outputs.markdown.as_ref().map(|p| p.display().to_string()),
     };
     let list_sizes = ListSizes {

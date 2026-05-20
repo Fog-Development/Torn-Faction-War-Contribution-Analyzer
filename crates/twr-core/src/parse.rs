@@ -102,12 +102,13 @@ pub fn extract_war_datetime(filename: &str) -> Result<(String, DateTime<Utc>), P
         String::from_utf8(s).expect("ascii only")
     };
 
-    let naive = NaiveDateTime::parse_from_str(&parseable[..parseable.len() - 1], "%Y-%m-%dT%H:%M:%S")
-        .map_err(|e| ParseError::InvalidDatetime {
-            filename: filename.to_string(),
-            value: datetime_str.to_string(),
-            detail: e.to_string(),
-        })?;
+    let naive =
+        NaiveDateTime::parse_from_str(&parseable[..parseable.len() - 1], "%Y-%m-%dT%H:%M:%S")
+            .map_err(|e| ParseError::InvalidDatetime {
+                filename: filename.to_string(),
+                value: datetime_str.to_string(),
+                detail: e.to_string(),
+            })?;
     let dt = DateTime::<Utc>::from_naive_utc_and_offset(naive, Utc);
 
     // Display name is everything before the matched datetime, with trailing `_` removed.
@@ -494,7 +495,10 @@ mod tests {
         for (filename, want_name, want_dt) in cases {
             let (name, dt) = extract_war_datetime(filename).expect(filename);
             assert_eq!(name, want_name, "name for {filename}");
-            assert_eq!(dt.to_rfc3339_opts(chrono::SecondsFormat::Secs, true), want_dt);
+            assert_eq!(
+                dt.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+                want_dt
+            );
         }
     }
 
@@ -518,7 +522,8 @@ mod tests {
 
     #[test]
     fn parse_war_csv_clean() {
-        let csv = "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,1,10,1000,9\nBob,2,5,500,4\n";
+        let csv =
+            "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,1,10,1000,9\nBob,2,5,500,4\n";
         let path = write_csv(csv, "Foo_2026-01-01T00-00-00Z.csv");
         let w = WarningCollector::new();
         let war = parse_war_csv(&path, &w).unwrap();
@@ -541,7 +546,8 @@ mod tests {
 
     #[test]
     fn parse_war_csv_malformed_row_warns() {
-        let csv = "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,1,10,oops,9\nBob,2,5,500,4\n";
+        let csv =
+            "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,1,10,oops,9\nBob,2,5,500,4\n";
         let path = write_csv(csv, "Foo_2026-01-01T00-00-00Z.csv");
         let w = WarningCollector::new();
         let war = parse_war_csv(&path, &w).unwrap();
@@ -567,7 +573,8 @@ mod tests {
 
     #[test]
     fn parse_war_csv_missing_attacker_id_warns() {
-        let csv = "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,,10,1000,9\nBob,2,5,500,4\n";
+        let csv =
+            "attacker_name,attacker_id,Hits,Points,WarHits\nAlice,,10,1000,9\nBob,2,5,500,4\n";
         let path = write_csv(csv, "Foo_2026-01-01T00-00-00Z.csv");
         let w = WarningCollector::new();
         let war = parse_war_csv(&path, &w).unwrap();

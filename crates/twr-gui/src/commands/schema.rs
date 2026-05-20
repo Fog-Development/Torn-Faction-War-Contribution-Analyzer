@@ -25,8 +25,8 @@ pub async fn get_schema(app: AppHandle) -> Result<SchemaInfo, String> {
         .map_err(|e| format!("failed to run schema: {e}"))?;
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let event: serde_json::Value = serde_json::from_str(stdout.trim())
-        .map_err(|e| format!("invalid schema JSON: {e}"))?;
+    let event: serde_json::Value =
+        serde_json::from_str(stdout.trim()).map_err(|e| format!("invalid schema JSON: {e}"))?;
 
     Ok(SchemaInfo {
         war_required: json_str_array(&event["war_required"]),

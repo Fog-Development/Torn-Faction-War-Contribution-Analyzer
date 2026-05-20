@@ -41,11 +41,22 @@ pub enum CliEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "stage", rename_all = "snake_case")]
 pub enum CliProgress {
-    ExpandWars { detail: String },
-    ParseWar { current: usize, total: usize, file: String },
-    ParseActivity { file: String },
+    ExpandWars {
+        detail: String,
+    },
+    ParseWar {
+        current: usize,
+        total: usize,
+        file: String,
+    },
+    ParseActivity {
+        file: String,
+    },
     Analyze,
-    Write { format: String, path: String },
+    Write {
+        format: String,
+        path: String,
+    },
 }
 
 /// Try to parse one line of NDJSON into a CliEvent. Returns None on empty lines.

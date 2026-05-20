@@ -44,11 +44,7 @@ pub struct Warning {
 }
 
 impl Warning {
-    pub fn new(
-        kind: WarningKind,
-        source: impl Into<String>,
-        detail: impl Into<String>,
-    ) -> Self {
+    pub fn new(kind: WarningKind, source: impl Into<String>, detail: impl Into<String>) -> Self {
         Self {
             kind,
             source: source.into(),
@@ -81,7 +77,10 @@ impl WarningCollector {
             detail = %warning.detail,
             "warning emitted"
         );
-        self.inner.lock().expect("warnings lock poisoned").push(warning);
+        self.inner
+            .lock()
+            .expect("warnings lock poisoned")
+            .push(warning);
     }
 
     pub fn extend(&self, others: impl IntoIterator<Item = Warning>) {

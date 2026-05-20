@@ -91,10 +91,7 @@ impl Config {
     }
 
     /// Build a config by layering: bundled → optional file → env → optional explicit overlay.
-    pub fn layered(
-        file: Option<&Path>,
-        cli: Option<&ConfigOverlay>,
-    ) -> Result<Self, ConfigError> {
+    pub fn layered(file: Option<&Path>, cli: Option<&ConfigOverlay>) -> Result<Self, ConfigError> {
         let mut cfg = Self::from_default()?;
 
         if let Some(path) = file {
@@ -102,11 +99,10 @@ impl Config {
                 path: path.display().to_string(),
                 source: e,
             })?;
-            let overlay: ConfigOverlay =
-                toml::from_str(&text).map_err(|e| ConfigError::Toml {
-                    path: path.display().to_string(),
-                    source: e,
-                })?;
+            let overlay: ConfigOverlay = toml::from_str(&text).map_err(|e| ConfigError::Toml {
+                path: path.display().to_string(),
+                source: e,
+            })?;
             cfg.apply_overlay(&overlay);
         }
 
@@ -145,21 +141,16 @@ impl Config {
     pub fn overlay_from_env() -> Result<ConfigOverlay, ConfigError> {
         let mut o = ConfigOverlay::default();
 
-        fn parse_env<T: std::str::FromStr>(
-            var: &str,
-        ) -> Result<Option<T>, ConfigError>
+        fn parse_env<T: std::str::FromStr>(var: &str) -> Result<Option<T>, ConfigError>
         where
             T::Err: std::fmt::Display,
         {
             match std::env::var(var) {
-                Ok(v) => v
-                    .parse::<T>()
-                    .map(Some)
-                    .map_err(|e| ConfigError::Env {
-                        var: var.to_string(),
-                        value: v,
-                        detail: e.to_string(),
-                    }),
+                Ok(v) => v.parse::<T>().map(Some).map_err(|e| ConfigError::Env {
+                    var: var.to_string(),
+                    value: v,
+                    detail: e.to_string(),
+                }),
                 Err(_) => Ok(None),
             }
         }

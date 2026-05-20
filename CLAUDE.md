@@ -91,16 +91,21 @@ sample-real-rw-and-member-data/   real Torn exports — use for format reference
 
 ```
 cargo build --release          # produces target/release/torn-war-report (CLI)
+cargo fmt --all                # ALWAYS run before committing — CI enforces rustfmt on all platforms
 cargo test                     # run all 37 tests (excludes twr-gui, which needs Tauri tooling)
 cargo test -p twr-core -p twr-report -p twr-cli   # explicit scope — always use this
 cargo check -p twr-gui         # type-check the GUI crate (build.rs creates a sidecar placeholder)
 ```
+
+**Formatting rule**: run `cargo fmt --all` after every code change. The CI `cargo fmt --all -- --check` step will fail the build on all three platforms (Linux, Windows, macOS) if any file is not formatted.
 
 All 37 tests must pass before committing:
 - 25 unit tests in `twr-core` (parse + analysis)
 - 10 CLI integration tests in `twr-cli/tests/cli.rs` (includes 3 `--emit=json` tests)
 - 1 pipeline integration test in `twr-core/tests/fixtures_pipeline.rs`
 - 1 insta markdown snapshot test in `twr-cli/tests/markdown_snapshot.rs`
+
+**Git commit rule**: never include a `Co-Authored-By:` trailer in commit messages.
 
 **GUI dev loop — use the helper script (Windows):**
 ```powershell

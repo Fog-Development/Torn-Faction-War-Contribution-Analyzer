@@ -46,7 +46,10 @@ fn fmt_opt_f64(v: Option<f64>) -> String {
 }
 
 /// Write all CSV files into `out_dir`, returning the list of files written.
-pub fn write_all(report: &AnalysisReport, out_dir: &Path) -> Result<Vec<std::path::PathBuf>, ReportError> {
+pub fn write_all(
+    report: &AnalysisReport,
+    out_dir: &Path,
+) -> Result<Vec<std::path::PathBuf>, ReportError> {
     std::fs::create_dir_all(out_dir).map_err(|e| ReportError::Io {
         path: out_dir.display().to_string(),
         source: e,
@@ -65,7 +68,10 @@ pub fn write_all(report: &AnalysisReport, out_dir: &Path) -> Result<Vec<std::pat
     Ok(written)
 }
 
-fn open(out_dir: &Path, filename: &str) -> Result<(BufWriter<File>, std::path::PathBuf), ReportError> {
+fn open(
+    out_dir: &Path,
+    filename: &str,
+) -> Result<(BufWriter<File>, std::path::PathBuf), ReportError> {
     let path = out_dir.join(filename);
     let f = File::create(&path).map_err(|e| ReportError::Io {
         path: path.display().to_string(),
@@ -276,11 +282,7 @@ pub fn write_war_matrix(
     write_record(&mut w, &headers).map_err(io_err(&path))?;
 
     for m in &report.members {
-        let mut row = vec![
-            m.name.clone(),
-            fmt_opt_u32(m.days),
-            fmt_opt_f64(m.avg_e30),
-        ];
+        let mut row = vec![m.name.clone(), fmt_opt_u32(m.days), fmt_opt_f64(m.avg_e30)];
         for wr in &m.wars {
             row.push(wr.points.to_string());
             row.push(wr.hits.to_string());
@@ -296,8 +298,16 @@ pub fn write_warnings(
     out_dir: &Path,
 ) -> Result<std::path::PathBuf, ReportError> {
     let (mut w, path) = open(out_dir, "warnings.csv")?;
-    write_record(&mut w, &["kind".into(), "source".into(), "context".into(), "detail".into()])
-        .map_err(io_err(&path))?;
+    write_record(
+        &mut w,
+        &[
+            "kind".into(),
+            "source".into(),
+            "context".into(),
+            "detail".into(),
+        ],
+    )
+    .map_err(io_err(&path))?;
     for warn in &report.warnings {
         write_record(
             &mut w,

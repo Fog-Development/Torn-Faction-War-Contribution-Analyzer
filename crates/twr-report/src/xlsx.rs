@@ -86,10 +86,7 @@ fn map_err(path: &Path) -> impl Fn(XlsxError) -> ReportError + '_ {
     }
 }
 
-fn add_sheet<'a>(
-    wb: &'a mut Workbook,
-    name: &str,
-) -> Result<&'a mut Worksheet, ReportError> {
+fn add_sheet<'a>(wb: &'a mut Workbook, name: &str) -> Result<&'a mut Worksheet, ReportError> {
     let ws = wb.add_worksheet();
     ws.set_name(name).map_err(|e| ReportError::Xlsx {
         path: name.into(),
@@ -98,11 +95,7 @@ fn add_sheet<'a>(
     Ok(ws)
 }
 
-fn write_headers(
-    ws: &mut Worksheet,
-    headers: &[&str],
-    fmt: &Formats,
-) -> Result<(), ReportError> {
+fn write_headers(ws: &mut Worksheet, headers: &[&str], fmt: &Formats) -> Result<(), ReportError> {
     for (col, h) in headers.iter().enumerate() {
         ws.write_with_format(0, col as u16, *h, &fmt.header)
             .map_err(|e| xerr(e))?;
@@ -147,7 +140,13 @@ fn overview_sheet(
 ) -> Result<(), ReportError> {
     let ws = add_sheet(wb, "Overview")?;
     let mut row: u32 = 0;
-    write_str(ws, row, 0, "Faction War Contribution Report", &fmt.body_bold)?;
+    write_str(
+        ws,
+        row,
+        0,
+        "Faction War Contribution Report",
+        &fmt.body_bold,
+    )?;
     row += 2;
     write_str(
         ws,
@@ -166,13 +165,7 @@ fn overview_sheet(
     write_str(ws, row, 0, "Configured thresholds", &fmt.body_bold)?;
     row += 1;
     write_str(ws, row, 0, "Low percentile", &fmt.body)?;
-    write_num(
-        ws,
-        row,
-        1,
-        report.config.analysis.low_percentile,
-        &fmt.body,
-    )?;
+    write_num(ws, row, 1, report.config.analysis.low_percentile, &fmt.body)?;
     row += 1;
     write_str(ws, row, 0, "Activity threshold (avgE30)", &fmt.body)?;
     write_num(
@@ -213,9 +206,15 @@ fn overview_sheet(
 
     write_str(ws, row, 0, "Wars", &fmt.body_bold)?;
     row += 1;
-    for (i, h) in ["War", "Start (UTC)", "Days ago", "Participants", "Low threshold"]
-        .iter()
-        .enumerate()
+    for (i, h) in [
+        "War",
+        "Start (UTC)",
+        "Days ago",
+        "Participants",
+        "Low threshold",
+    ]
+    .iter()
+    .enumerate()
     {
         ws.write_with_format(row, i as u16, *h, &fmt.header)
             .map_err(xerr)?;
@@ -260,8 +259,7 @@ fn write_member_sheet(
     names: &[String],
     pick: impl Fn(&MemberSummary) -> Vec<String>,
 ) -> Result<(), ReportError> {
-    let mut all_headers: Vec<String> =
-        fixed_headers.iter().map(|s| (*s).to_string()).collect();
+    let mut all_headers: Vec<String> = fixed_headers.iter().map(|s| (*s).to_string()).collect();
     for war in &report.wars {
         all_headers.push(war.display_name.clone());
     }
@@ -298,7 +296,8 @@ fn write_member_sheet(
                 _ => &fmt.body,
             };
             if matches!(wr.category, WarCategory::Excluded) {
-                ws.write_with_format(row, col, "—", cell_fmt).map_err(xerr)?;
+                ws.write_with_format(row, col, "—", cell_fmt)
+                    .map_err(xerr)?;
             } else {
                 ws.write_with_format(row, col, wr.points as f64, cell_fmt)
                     .map_err(xerr)?;
@@ -316,13 +315,7 @@ fn auto_kick_sheet(
 ) -> Result<(), ReportError> {
     let ws = add_sheet(wb, "Auto-Kick")?;
     let fixed_headers = &[
-        "Name",
-        "Days",
-        "Zero",
-        "Low",
-        "Present",
-        "Avg Pts",
-        "avgE30",
+        "Name", "Days", "Zero", "Low", "Present", "Avg Pts", "avgE30",
     ];
     write_member_sheet(ws, report, fmt, fixed_headers, &report.auto_kick, |m| {
         vec![
@@ -343,9 +336,7 @@ fn repeat_offenders_sheet(
     fmt: &Formats,
 ) -> Result<(), ReportError> {
     let ws = add_sheet(wb, "Repeat Offenders")?;
-    let fixed_headers = &[
-        "Name", "Days", "Poor", "Zero", "Low", "Present", "Avg Pts",
-    ];
+    let fixed_headers = &["Name", "Days", "Poor", "Zero", "Low", "Present", "Avg Pts"];
     write_member_sheet(
         ws,
         report,
@@ -398,7 +389,9 @@ fn low_activity_sheet(
     fmt: &Formats,
 ) -> Result<(), ReportError> {
     let ws = add_sheet(wb, "Low avgE30")?;
-    let headers = &["Name", "Days", "avgE30", "Present", "Zero", "Low", "Avg Pts"];
+    let headers = &[
+        "Name", "Days", "avgE30", "Present", "Zero", "Low", "Avg Pts",
+    ];
     write_headers(ws, headers, fmt)?;
 
     for (rowi, name) in report.low_activity.iter().enumerate() {
@@ -429,7 +422,14 @@ fn combined_kick_sheet(
 ) -> Result<(), ReportError> {
     let ws = add_sheet(wb, "Combined Kick List")?;
     let headers = &[
-        "Name", "Days", "avgE30", "Poor", "Zero", "Low", "Avg Pts", "Auto-Kick",
+        "Name",
+        "Days",
+        "avgE30",
+        "Poor",
+        "Zero",
+        "Low",
+        "Avg Pts",
+        "Auto-Kick",
     ];
     write_headers(ws, headers, fmt)?;
 
@@ -487,7 +487,8 @@ fn war_matrix_sheet(
                 _ => &fmt.body,
             };
             if matches!(wr.category, WarCategory::Excluded) {
-                ws.write_with_format(row, col, "—", cell_fmt).map_err(xerr)?;
+                ws.write_with_format(row, col, "—", cell_fmt)
+                    .map_err(xerr)?;
                 ws.write_with_format(row, col + 1, "—", cell_fmt)
                     .map_err(xerr)?;
             } else {

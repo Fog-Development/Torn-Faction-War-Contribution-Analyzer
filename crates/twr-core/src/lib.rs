@@ -9,9 +9,7 @@ pub mod model;
 pub mod parse;
 pub mod warnings;
 
-pub use analysis::{
-    analyze as analyze_in_memory, analyze_with_collector, AnalysisError,
-};
+pub use analysis::{analyze as analyze_in_memory, analyze_with_collector, AnalysisError};
 pub use config::{
     AnalysisConfig, AnalysisOverlay, Config, ConfigError, ConfigOverlay, OutputConfig,
     OutputOverlay,
