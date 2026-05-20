@@ -32,10 +32,8 @@ pub fn expand_war_paths(inputs: &[String]) -> anyhow::Result<Vec<PathBuf>> {
             for entry in std::fs::read_dir(p)? {
                 let entry = entry?;
                 let path = entry.path();
-                if path.is_file() && is_csv(&path) {
-                    if seen.insert(path.clone()) {
-                        out.push(path);
-                    }
+                if path.is_file() && is_csv(&path) && seen.insert(path.clone()) {
+                    out.push(path);
                 }
             }
         } else if p.is_file() {
