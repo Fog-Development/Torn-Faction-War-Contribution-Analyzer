@@ -3,6 +3,11 @@
 
 # Generated reports (produced by the tool at runtime)
 /reports/
+/crates/twr-gui/reports/
+
+# Tauri generated schemas and sidecar binaries (built by gui.ps1, not committed)
+/crates/twr-gui/gen/
+/crates/twr-gui/binaries/*.exe
 
 # Config overrides (user-local, not part of the project)
 torn-war-report.toml

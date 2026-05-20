@@ -4,6 +4,7 @@ members = [
     "crates/twr-core",
     "crates/twr-report",
     "crates/twr-cli",
+    "crates/twr-gui",
 ]
 
 [workspace.package]

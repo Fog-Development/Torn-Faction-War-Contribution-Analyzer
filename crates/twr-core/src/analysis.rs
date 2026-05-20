@@ -213,20 +213,11 @@ pub fn analyze_with_collector(
                 None => (false, 0, 0),
             };
 
-            // For presence: if Days < min_days_for_activity → not present (insufficient tenure),
-            // but still report listed_in_csv.
-            let tenure_ok = days
-                .map(|d| d >= config.analysis.min_days_for_activity)
-                .unwrap_or(true); // missing days but listed in war is fine per spec
-
-            let present = if !listed {
-                false
-            } else if !tenure_ok {
-                // Member listed in a war but lacks the minimum tenure: still warn once.
-                false
-            } else {
-                is_present(days, days_ago[wi], listed)
-            };
+            // Presence = member was in faction when war occurred.
+            // If Days is known: days > days_ago (strict). If Days unknown but listed: present.
+            // Not being listed in the war CSV does NOT mean absent — members who earned 0 points
+            // may simply not appear in the export.
+            let present = is_present(days, days_ago[wi], listed);
 
             let category = classify_member(points, present, war_thresholds[wi]);
 

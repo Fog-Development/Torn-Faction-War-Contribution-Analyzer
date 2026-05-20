@@ -146,3 +146,93 @@ fn schema_prints_columns() {
         .stdout(predicate::str::contains("avgE30"))
         .stdout(predicate::str::contains("Filename convention"));
 }
+
+// ── emit=json tests ──────────────────────────────────────────────────────────
+
+#[test]
+fn analyze_emit_json_start_and_done() {
+    let out = tempdir().unwrap();
+    let raw = cmd()
+        .arg("--emit=json")
+        .arg("analyze")
+        .arg("--wars")
+        .arg(wars_dir())
+        .arg("--activity")
+        .arg(activity_csv())
+        .arg("--output")
+        .arg(out.path())
+        .arg("--reference-time")
+        .arg("2026-05-01T00:00:00Z")
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let text = String::from_utf8(raw).unwrap();
+    let lines: Vec<&str> = text.lines().collect();
+    assert!(!lines.is_empty(), "no output lines");
+
+    let first: serde_json::Value = serde_json::from_str(lines[0]).expect("first line is JSON");
+    assert_eq!(first["type"], "start", "first event must be 'start'");
+    assert_eq!(first["subcommand"], "analyze");
+
+    let last: serde_json::Value =
+        serde_json::from_str(lines[lines.len() - 1]).expect("last line is JSON");
+    assert_eq!(last["type"], "done", "last event must be 'done'");
+    assert_eq!(last["exit_code"], 0);
+
+    // run.json manifest must exist.
+    assert_path_exists(&out.path().join("run.json"));
+    let manifest: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(out.path().join("run.json")).unwrap())
+            .unwrap();
+    assert!(manifest["reference_time"].is_string());
+    assert!(manifest["config"].is_object());
+}
+
+#[test]
+fn validate_emit_json_shape() {
+    let raw = cmd()
+        .arg("--emit=json")
+        .arg("validate")
+        .arg("--wars")
+        .arg(wars_dir())
+        .arg("--activity")
+        .arg(activity_csv())
+        .assert()
+        .code(predicate::in_iter(vec![0, 3]))
+        .get_output()
+        .stdout
+        .clone();
+
+    let text = String::from_utf8(raw).unwrap();
+    let lines: Vec<&str> = text.lines().filter(|l| !l.is_empty()).collect();
+    assert!(!lines.is_empty());
+
+    let last: serde_json::Value =
+        serde_json::from_str(lines[lines.len() - 1]).expect("last line is JSON");
+    assert_eq!(last["type"], "validate_done");
+    assert!(last["war_files"].is_number());
+}
+
+#[test]
+fn schema_emit_json_shape() {
+    let raw = cmd()
+        .arg("--emit=json")
+        .arg("schema")
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let text = String::from_utf8(raw).unwrap();
+    let lines: Vec<&str> = text.lines().filter(|l| !l.is_empty()).collect();
+    assert_eq!(lines.len(), 1, "schema --emit=json should emit exactly one line");
+
+    let obj: serde_json::Value = serde_json::from_str(lines[0]).expect("output is JSON");
+    assert_eq!(obj["type"], "schema");
+    assert!(obj["war_required"].is_array());
+    assert!(obj["activity_required"].is_array());
+}

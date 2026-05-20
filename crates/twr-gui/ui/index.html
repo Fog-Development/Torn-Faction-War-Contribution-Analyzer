@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torn War Report</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Torn War Report</h1>
+    <nav>
+      <button class="tab-btn active" data-tab="inputs">Inputs</button>
+      <button class="tab-btn" data-tab="config">Config</button>
+      <button class="tab-btn" data-tab="run">Run</button>
+      <button class="tab-btn" data-tab="history">History</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="tab-inputs"  class="tab-panel active"></div>
+    <div id="tab-config"  class="tab-panel"></div>
+    <div id="tab-run"     class="tab-panel"></div>
+    <div id="tab-history" class="tab-panel"></div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

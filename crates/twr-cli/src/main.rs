@@ -1,13 +1,20 @@
 //! `torn-war-report` — CLI entrypoint.
 
 mod commands;
+mod events;
 mod glob;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use tracing_subscriber::EnvFilter;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum EmitMode {
+    Text,
+    Json,
+}
 
 #[derive(Debug, Parser)]
 #[command(
@@ -27,6 +34,10 @@ struct Cli {
     /// Suppress non-error output.
     #[arg(short, long, global = true)]
     quiet: bool,
+
+    /// Output format: `text` (default, human-readable) or `json` (NDJSON events on stdout).
+    #[arg(long, global = true, default_value = "text")]
+    emit: EmitMode,
 
     #[command(subcommand)]
     command: Command,
@@ -64,9 +75,11 @@ fn main() -> ExitCode {
 
 fn dispatch(cli: Cli) -> anyhow::Result<i32> {
     match cli.command {
-        Command::Analyze(args) => commands::analyze::run(args, cli.config.as_deref()),
-        Command::Validate(args) => commands::validate::run(args),
-        Command::Schema => commands::schema::run().map(|_| 0),
+        Command::Analyze(args) => {
+            commands::analyze::run(args, cli.config.as_deref(), cli.emit)
+        }
+        Command::Validate(args) => commands::validate::run(args, cli.emit),
+        Command::Schema => commands::schema::run(cli.emit).map(|_| 0),
     }
 }
 

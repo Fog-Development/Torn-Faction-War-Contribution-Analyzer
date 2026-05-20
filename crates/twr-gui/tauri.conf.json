@@ -1,0 +1,34 @@
+{
+  "productName": "Torn War Report",
+  "version": "0.1.0",
+  "identifier": "com.justinv.torn-war-report",
+  "build": {
+    "frontendDist": "ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Torn War Report",
+        "width": 1100,
+        "height": 750,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [],
+    "externalBin": [
+      "binaries/torn-war-report"
+    ],
+    "windows": {
+      "nsis": {},
+      "wix": {}
+    }
+  }
+}

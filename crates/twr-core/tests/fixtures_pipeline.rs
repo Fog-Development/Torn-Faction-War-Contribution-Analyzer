@@ -68,7 +68,10 @@ fn full_pipeline_against_fixtures() {
     assert!(warn_text.contains("BadRow"));
     assert!(!report.members.iter().any(|m| m.name == "BadRow"));
 
-    // Ruth has no war participation → present_count == 0 across the board.
+    // Ruth never appears in any war CSV but Days=160 means she was present for all 4 wars.
+    // She should be classified Zero for every war, with zero points.
     let ruth = report.members.iter().find(|m| m.name == "Ruth").unwrap();
-    assert_eq!(ruth.present_count, 0);
+    assert_eq!(ruth.present_count, 4);
+    assert_eq!(ruth.zero_count, 4);
+    assert_eq!(ruth.avg_points, 0.0);
 }

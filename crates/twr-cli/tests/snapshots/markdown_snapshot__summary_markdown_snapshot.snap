@@ -36,21 +36,30 @@ Rollup lists are derived from the per-member counts and the optional activity fe
 | InsufficientTenure | analysis | Trent | member `Trent` has Days=5 (< min_days=7); excluded from activity analysis |
 | InsufficientTenure | analysis | Uma | member `Uma` has Days=3 (< min_days=7); excluded from activity analysis |
 
-## 🚨 Auto-Kick List (1 members)
+## 🚨 Auto-Kick List (5 members)
 
 | Member | Days | Present | Zero | Low | Poor | Avg Pts | avgE30 |
 |---|---|---|---|---|---|---|---|
 | Carol | 150 | 4 | 2 | 2 | 4 | 1075.0 | 800.0 |
+| Ruth | 160 | 4 | 4 | 0 | 4 | 0 | 690.0 |
+| Zane | 440 | 4 | 4 | 0 | 4 | 0 | 1700.0 |
+| Blair | 75 | 2 | 2 | 0 | 2 | 0 | 460.0 |
+| Cory | 135 | 4 | 4 | 0 | 4 | 0 | 620.0 |
 
-## Repeat Offenders (5 members)
+## Repeat Offenders (10 members)
 
 | Member | Days | Present | Zero | Low | Poor | Avg Pts | avgE30 |
 |---|---|---|---|---|---|---|---|
 | Carol | 150 | 4 | 2 | 2 | 4 | 1075.0 | 800.0 |
 | Heidi | 180 | 4 | 1 | 3 | 4 | 1200.0 | 700.0 |
 | Mallory | 170 | 4 | 1 | 3 | 4 | 1000.0 | 720.0 |
-| Niaj | 100 | 2 | 0 | 2 | 2 | 1950.0 | 550.0 |
-| Xavier | 140 | 3 | 0 | 3 | 3 | 1700.0 | 640.0 |
+| Niaj | 100 | 3 | 1 | 2 | 3 | 1950.0 | 550.0 |
+| Ruth | 160 | 4 | 4 | 0 | 4 | 0 | 690.0 |
+| Sybil | 110 | 3 | 1 | 1 | 2 | 2050.0 | 580.0 |
+| Xavier | 140 | 4 | 1 | 3 | 4 | 1700.0 | 640.0 |
+| Zane | 440 | 4 | 4 | 0 | 4 | 0 | 1700.0 |
+| Blair | 75 | 2 | 2 | 0 | 2 | 0 | 460.0 |
+| Cory | 135 | 4 | 4 | 0 | 4 | 0 | 620.0 |
 
 ## Low Activity — avgE30 < 750 (14 members)
 
@@ -60,22 +69,26 @@ Rollup lists are derived from the per-member counts and the optional activity fe
 | Eve | 45 | 400.0 | 1 | 0 | 1 | 400.0 |
 | Heidi | 180 | 700.0 | 4 | 1 | 3 | 1200.0 |
 | Ivan | 120 | 600.0 | 3 | 0 | 1 | 2200.0 |
-| Judy | 60 | 300.0 | 0 | 0 | 0 | 0 |
+| Judy | 60 | 300.0 | 1 | 1 | 0 | 0 |
 | Mallory | 170 | 720.0 | 4 | 1 | 3 | 1000.0 |
-| Niaj | 100 | 550.0 | 2 | 0 | 2 | 1950.0 |
+| Niaj | 100 | 550.0 | 3 | 1 | 2 | 1950.0 |
 | Olivia | 30 | 200.0 | 0 | 0 | 0 | 0 |
-| Ruth | 160 | 690.0 | 0 | 0 | 0 | 0 |
-| Sybil | 110 | 580.0 | 2 | 0 | 1 | 2050.0 |
-| Xavier | 140 | 640.0 | 3 | 0 | 3 | 1700.0 |
-| Yara | 55 | 280.0 | 0 | 0 | 0 | 0 |
-| Blair | 75 | 460.0 | 0 | 0 | 0 | 0 |
-| Cory | 135 | 620.0 | 0 | 0 | 0 | 0 |
+| Ruth | 160 | 690.0 | 4 | 4 | 0 | 0 |
+| Sybil | 110 | 580.0 | 3 | 1 | 1 | 2050.0 |
+| Xavier | 140 | 640.0 | 4 | 1 | 3 | 1700.0 |
+| Yara | 55 | 280.0 | 1 | 1 | 0 | 0 |
+| Blair | 75 | 460.0 | 2 | 2 | 0 | 0 |
+| Cory | 135 | 620.0 | 4 | 4 | 0 | 0 |
 
-## 🚨 Combined Kick List (4 members)
+## 🚨 Combined Kick List (8 members)
 
 | Member | Days | avgE30 | Poor | Zero | Low | Avg Pts | Auto-Kick |
 |---|---|---|---|---|---|---|---|
 | Heidi | 180 | 700.0 | 4 | 1 | 3 | 1200.0 | no |
 | Mallory | 170 | 720.0 | 4 | 1 | 3 | 1000.0 | no |
-| Niaj | 100 | 550.0 | 2 | 0 | 2 | 1950.0 | no |
-| Xavier | 140 | 640.0 | 3 | 0 | 3 | 1700.0 | no |
+| Niaj | 100 | 550.0 | 3 | 1 | 2 | 1950.0 | no |
+| Ruth | 160 | 690.0 | 4 | 4 | 0 | 0 | yes |
+| Sybil | 110 | 580.0 | 2 | 1 | 1 | 2050.0 | no |
+| Xavier | 140 | 640.0 | 4 | 1 | 3 | 1700.0 | no |
+| Blair | 75 | 460.0 | 2 | 2 | 0 | 0 | yes |
+| Cory | 135 | 620.0 | 4 | 4 | 0 | 0 | yes |

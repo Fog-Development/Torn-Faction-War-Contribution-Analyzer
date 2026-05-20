@@ -1,0 +1,167 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-cli:
+    name: Build CLI (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            archive: tar.gz
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install Tauri system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
+            libssl-dev libgtk-3-dev libayatana-appindicator3-dev
+
+      - name: Build CLI
+        run: cargo build -p twr-cli --release --locked
+
+      - name: Stage CLI artifact (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p dist
+          cp target/release/torn-war-report dist/
+          cp README.md LICENSE default-config.toml dist/ 2>/dev/null || true
+          cd dist
+          tar czf ../torn-war-report-${{ github.ref_name }}-${{ matrix.target }}.tar.gz .
+
+      - name: Stage CLI artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist
+          Copy-Item target\release\torn-war-report.exe dist\
+          if (Test-Path README.md)        { Copy-Item README.md dist\ }
+          if (Test-Path LICENSE)          { Copy-Item LICENSE dist\ }
+          if (Test-Path default-config.toml) { Copy-Item default-config.toml dist\ }
+          Compress-Archive -Path dist\* -DestinationPath "torn-war-report-${{ github.ref_name }}-${{ matrix.target }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}
+          path: torn-war-report-${{ github.ref_name }}-${{ matrix.target }}.${{ matrix.archive }}
+
+  build-gui:
+    name: Build GUI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin_suffix: ''
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin_suffix: '.exe'
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            bin_suffix: ''
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install Tauri system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
+            libssl-dev libgtk-3-dev libayatana-appindicator3-dev
+
+      - name: Build CLI sidecar
+        run: cargo build -p twr-cli --release --locked
+
+      - name: Copy sidecar into GUI binaries/ (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p crates/twr-gui/binaries
+          cp target/release/torn-war-report \
+             crates/twr-gui/binaries/torn-war-report-${{ matrix.target }}
+
+      - name: Copy sidecar into GUI binaries/ (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force crates\twr-gui\binaries
+          Copy-Item target\release\torn-war-report.exe `
+            crates\twr-gui\binaries\torn-war-report-${{ matrix.target }}.exe
+
+      - name: Build Tauri GUI
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: crates/twr-gui
+          # Don't create a release here — the publish job does that.
+          tagName: ''
+          releaseName: ''
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gui-${{ matrix.os }}
+          path: |
+            target/release/bundle/**/*.exe
+            target/release/bundle/**/*.msi
+            target/release/bundle/**/*.AppImage
+            target/release/bundle/**/*.dmg
+
+  publish:
+    name: Publish GitHub Release
+    needs: [build-cli, build-gui]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f \( \
+            -name "*.zip" -o -name "*.tar.gz" \
+            -o -name "*.exe" -o -name "*.msi" \
+            -o -name "*.AppImage" -o -name "*.dmg" \
+          \) -exec cp {} release-assets/ \;
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          body_path: .github/release-template.md
+          files: release-assets/*
