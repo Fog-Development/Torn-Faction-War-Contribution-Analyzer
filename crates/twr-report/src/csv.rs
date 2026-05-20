@@ -55,13 +55,14 @@ pub fn write_all(
         source: e,
     })?;
 
-    let mut written = Vec::new();
-    written.push(write_auto_kick(report, out_dir)?);
-    written.push(write_repeat_offenders(report, out_dir)?);
-    written.push(write_any_bad_war(report, out_dir)?);
-    written.push(write_low_activity(report, out_dir)?);
-    written.push(write_combined_kick(report, out_dir)?);
-    written.push(write_war_matrix(report, out_dir)?);
+    let mut written = vec![
+        write_auto_kick(report, out_dir)?,
+        write_repeat_offenders(report, out_dir)?,
+        write_any_bad_war(report, out_dir)?,
+        write_low_activity(report, out_dir)?,
+        write_combined_kick(report, out_dir)?,
+        write_war_matrix(report, out_dir)?,
+    ];
     if !report.warnings.is_empty() {
         written.push(write_warnings(report, out_dir)?);
     }

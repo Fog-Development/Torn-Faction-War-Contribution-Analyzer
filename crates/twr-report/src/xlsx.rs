@@ -98,9 +98,9 @@ fn add_sheet<'a>(wb: &'a mut Workbook, name: &str) -> Result<&'a mut Worksheet, 
 fn write_headers(ws: &mut Worksheet, headers: &[&str], fmt: &Formats) -> Result<(), ReportError> {
     for (col, h) in headers.iter().enumerate() {
         ws.write_with_format(0, col as u16, *h, &fmt.header)
-            .map_err(|e| xerr(e))?;
+            .map_err(xerr)?;
     }
-    ws.set_freeze_panes(1, 0).map_err(|e| xerr(e))?;
+    ws.set_freeze_panes(1, 0).map_err(xerr)?;
     Ok(())
 }
 
