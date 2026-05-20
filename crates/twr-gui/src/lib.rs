@@ -15,12 +15,19 @@ impl RunRegistry {
     }
 }
 
+impl Default for RunRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_opener::init())
         .manage(RunRegistry::new())
         .invoke_handler(tauri::generate_handler![
             commands::analyze::spawn_analyze,

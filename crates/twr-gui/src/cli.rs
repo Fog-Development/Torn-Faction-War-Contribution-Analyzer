@@ -26,10 +26,9 @@ pub fn sidecar_path(app: &AppHandle) -> PathBuf {
         .and_then(|p| p.parent()) // workspace root
         .unwrap_or(manifest_dir);
 
-    let bin = if cfg!(windows) {
+    if cfg!(windows) {
         workspace_root.join("target/debug/torn-war-report.exe")
     } else {
         workspace_root.join("target/debug/torn-war-report")
-    };
-    bin
+    }
 }

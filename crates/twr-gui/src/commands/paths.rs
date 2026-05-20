@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_dialog::DialogExt;
-use tauri_plugin_shell::ShellExt;
+use tauri_plugin_opener::OpenerExt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppSettings {
@@ -69,7 +69,7 @@ pub async fn pick_files(app: AppHandle, multi: bool) -> Result<Vec<String>, Stri
 
 #[tauri::command]
 pub async fn open_path(app: AppHandle, path: String) -> Result<(), String> {
-    app.shell()
-        .open(&path, None)
+    app.opener()
+        .open_path(&path, None::<&str>)
         .map_err(|e| format!("open failed: {e}"))
 }

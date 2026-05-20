@@ -92,12 +92,15 @@ sample-real-rw-and-member-data/   real Torn exports — use for format reference
 ```
 cargo build --release          # produces target/release/torn-war-report (CLI)
 cargo fmt --all                # ALWAYS run before committing — CI enforces rustfmt on all platforms
+cargo clippy --workspace --all-targets -- -D warnings   # ALWAYS run before committing — mirrors CI exactly
 cargo test                     # run all 37 tests (excludes twr-gui, which needs Tauri tooling)
 cargo test -p twr-core -p twr-report -p twr-cli   # explicit scope — always use this
 cargo check -p twr-gui         # type-check the GUI crate (build.rs creates a sidecar placeholder)
 ```
 
 **Formatting rule**: run `cargo fmt --all` after every code change. The CI `cargo fmt --all -- --check` step will fail the build on all three platforms (Linux, Windows, macOS) if any file is not formatted.
+
+**Clippy rule**: run `cargo clippy --workspace --all-targets -- -D warnings` after every code change. This is the exact command CI runs — it covers all crates including `twr-gui`. Do not use a narrower scope or clippy failures in `twr-gui` will only appear in CI.
 
 All 37 tests must pass before committing:
 - 25 unit tests in `twr-core` (parse + analysis)
